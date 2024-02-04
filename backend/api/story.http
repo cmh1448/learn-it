@@ -1,0 +1,22 @@
+# @name login
+POST http://127.0.0.1:6000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "cmh1448@naver.com",
+  "password": "roqkfeo#01"
+}
+
+### My Story List
+GET http://127.0.0.1:6000/api/stories/my
+Authorization: Bearer {{login.response.body.token}}
+
+### New Story
+POST http://127.0.0.1:6000/api/stories
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "title": "자바 프로그래밍",
+  "content": "프로그래밍의 기본! 객체지향 프로그래밍을 배우기 위한 가장 좋은 시작입니다."
+}
