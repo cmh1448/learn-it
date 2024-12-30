@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.web.filter.OncePerRequestFilter
 import java.time.format.DateTimeFormatter
 
-class JwtRefreshTokenResolver(
+class JwtRefreshTokenFilter(
     private val accessTokenExpireHours: Long,
     private val jwtTokenProvider: JwtTokenProvider
 ) : OncePerRequestFilter() {

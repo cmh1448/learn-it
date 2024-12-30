@@ -1,5 +1,6 @@
 package github.cmh1448.backend.system.exception.handler
 
+import github.cmh1448.backend.system.exception.dto.ErrorDto
 import github.cmh1448.backend.system.exception.model.ErrorCode
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus

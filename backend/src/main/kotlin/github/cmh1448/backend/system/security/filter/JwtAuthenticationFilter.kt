@@ -14,8 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.servlet.HandlerExceptionResolver
 
-class JwtAuthenticationFilter (
-    private val userLoadService: UserLoadService<AuthDetails>,
+class JwtAuthenticationFilter<T : AuthDetails> (
+    private val userLoadService: UserLoadService<T>,
     private val handlerExceptionResolver: HandlerExceptionResolver
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
