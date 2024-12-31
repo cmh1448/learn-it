@@ -6,6 +6,5 @@ class JwtDto {
     class TokenData (
         val tokenString: String,
         val expireAt: LocalDateTime
-    ){
-    }
+    )
 }
