@@ -2,6 +2,11 @@ package github.cmh1448.backend.system.exception.handler
 
 import github.cmh1448.backend.system.exception.dto.ErrorDto
 import github.cmh1448.backend.system.exception.model.ErrorCode
+import github.cmh1448.backend.system.exception.model.RestException
+import github.cmh1448.backend.system.security.exception.JwtAuthenticationException
+import github.cmh1448.backend.system.security.exception.JwtInvalidTokenException
+import github.cmh1448.backend.system.security.exception.JwtTokenExpiredException
+import github.cmh1448.backend.system.security.exception.JwtTokenMissingException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,7 +25,6 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageConversionException::class)
     fun handleRestException(error: Exception): ResponseEntity<ErrorDto.ErrorResponse> {
-//        log.error("{Internal Exception}: " + exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 ErrorDto.ErrorResponse(
@@ -54,6 +58,30 @@ class GlobalExceptionHandler {
             .body(
                 ErrorDto.ErrorResponse(
                     ErrorCode.GLOBAL_BAD_REQUEST
+                )
+            )
+    }
+    @ExceptionHandler(JwtAuthenticationException::class)
+    fun handleJwtAuthenticationException(exception: JwtAuthenticationException): ResponseEntity<ErrorDto.ErrorResponse> {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(
+                ErrorDto.ErrorResponse(
+                    when (exception) {
+                        is JwtInvalidTokenException -> ErrorCode.JWT_INVALID_TOKEN
+                        is JwtTokenExpiredException -> ErrorCode.JWT_TOKEN_EXPIRED
+                        is JwtTokenMissingException -> ErrorCode.JWT_TOKEN_MISSING
+                        else -> ErrorCode.JWT_PARSE_ERROR
+                    }
+                )
+            )
+    }
+
+    @ExceptionHandler(RestException::class)
+    fun handleRestException(exception: RestException): ResponseEntity<ErrorDto.ErrorResponse> {
+        return ResponseEntity.status(exception.errorCode.statusCode)
+            .body(
+                ErrorDto.ErrorResponse(
+                    exception.errorCode
                 )
             )
     }

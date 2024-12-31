@@ -21,8 +21,8 @@ class SecurityConfiguration (
         jwtAutoConfigurerFactory.create(userLoadService)
             .pathConfigure {
                 it.includeAll()
-                it.excludePath("/api/user/login")
-                it.excludePath("/api/user/register")
+                it.excludePath("/api/users/login")
+                it.excludePath("/api/users/register")
             }
             .configure(http)
 

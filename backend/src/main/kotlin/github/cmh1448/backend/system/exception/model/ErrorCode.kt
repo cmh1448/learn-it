@@ -11,6 +11,12 @@ enum class ErrorCode(
     GLOBAL_METHOD_NOT_ALLOWED(405, "허용되지 않는 Method 입니다."),
     GLOBAL_INVALID_PARAMETER(400, "올바르지 않은 파라미터입니다."),
 
+    //JWT
+    JWT_INVALID_TOKEN(401, "유효하지 않은 토큰입니다."),
+    JWT_PARSE_ERROR(401, "토큰을 파싱하는데 실패하였습니다."),
+    JWT_TOKEN_EXPIRED(401, "토큰이 만료되었습니다."),
+    JWT_TOKEN_MISSING(401, "토큰이 없습니다."),
+
     // USER
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
     USER_PASSWORD_MISMATCH(400, "비밀번호가 일치하지 않습니다."),
