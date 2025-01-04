@@ -21,5 +21,12 @@ enum class ErrorCode(
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
     USER_PASSWORD_MISMATCH(400, "비밀번호가 일치하지 않습니다."),
 
-    INTERNAL_SERVER_ERROR(500, "알수없는 오류가 발생하였습니다."),
+    // STUDY
+    STUDY_TYPE_CHANGE_NOT_ALLOWED(400, "공개 스터디는 스터디 유형을 변경할 수 없습니다."),
+    STUDY_NOT_PUBLIC(400, "공개 스터디가 아닙니다."),
+    STUDY_ONLY_MASTER_CAN_INVITE(400, "스터디의 마스터만 초대를 할 수 있습니다."),
+    STUDY_ONLY_MASTER_CAN_DELETE(403, "스터디의 마스터만 삭제할 수 있습니다."),
+
+    STUDY_INVITATION_EXPIRED(400, "초대가 만료되었습니다."),
+    INTERNAL_SERVER_ERROR(500, "알수없는 오류가 발생하였습니다.");
 }

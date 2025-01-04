@@ -7,7 +7,12 @@ class UserDto {
     class Response (
         val email: String,
         val username: String,
-    )
+    ) {
+        constructor(user: User) : this(
+            email = user.email,
+            username = user.username,
+        )
+    }
 
     class LoginRequest (
         val email: String,
