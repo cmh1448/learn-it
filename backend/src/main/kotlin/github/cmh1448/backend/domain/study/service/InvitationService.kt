@@ -28,6 +28,44 @@ class InvitationService(
         study.members.add(user.entity)
     }
 
+    fun leave(studyId: Long, user: UserDetails) {
+        val study = studyRepository.findById(studyId)
+            .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
+
+        onlyMemberCanLeaveStudy(study, user)
+
+        study.members.remove(user.entity)
+    }
+
+    private fun onlyMemberCanLeaveStudy(
+        study: Study,
+        user: UserDetails
+    ) {
+        (study.members.indexOf(user.entity)
+            .takeIf { it != -1 }
+            ?: throw RestException(ErrorCode.STUDY_NOT_MEMBER))
+    }
+
+    fun kick(studyId: Long, request: StudyDto.KickRequest, user: UserDetails) {
+        val study = studyRepository.findById(studyId)
+            .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
+
+        val member = study.members.find { it.email == request.memberEmail }
+            ?: throw RestException(ErrorCode.STUDY_NOT_MEMBER)
+
+        onlyMasterCanKickMember(study, user)
+
+        study.members.remove(member)
+    }
+
+    private fun onlyMasterCanKickMember(
+        study: Study,
+        user: UserDetails
+    ) {
+        if (study.master?.email != user.email)
+            throw RestException(ErrorCode.STUDY_ONLY_MASTER_CAN_KICK)
+    }
+
     fun createInvitationToken(studyId: Long, expireDate: LocalDate, user: UserDetails) : StudyDto.InvitationTokenResponse {
         val foundStudy = studyRepository.findById(studyId)
             .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
@@ -51,7 +89,17 @@ class InvitationService(
         val study = studyRepository.findById(tokenData.studyId)
             .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
 
+        cannotJoinTwice(study, user)
+
         study.members.add(user.entity)
+    }
+
+    private fun cannotJoinTwice(
+        study: Study,
+        user: UserDetails
+    ) {
+        if (study.members.find { it.email == user.email } != null)
+            throw RestException(ErrorCode.STUDY_ALREADY_MEMBER)
     }
 
     private fun onlyMasterCanInvite(

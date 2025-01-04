@@ -73,4 +73,26 @@ class StudyController(
     ) {
         invitationService.processInvitation(request.token, user)
     }
+
+    @PostMapping("/{studyId}/leave")
+    fun leaveStudy(
+        @PathVariable
+        studyId: Long,
+        @AuthenticationPrincipal
+        user: UserDetails
+    ) {
+        invitationService.leave(studyId, user)
+    }
+
+    @PostMapping("/{studyId}/kick")
+    fun kickMember(
+        @PathVariable
+        studyId: Long,
+        @RequestBody
+        request: StudyDto.KickRequest,
+        @AuthenticationPrincipal
+        user: UserDetails
+    ) {
+        invitationService.kick(studyId, request, user)
+    }
 }

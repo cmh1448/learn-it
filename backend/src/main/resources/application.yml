@@ -15,7 +15,3 @@ logging:
 
 server:
   port: 8080
-
-service:
-  invitation:
-    secret: my-secret

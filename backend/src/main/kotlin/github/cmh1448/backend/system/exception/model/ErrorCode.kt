@@ -26,7 +26,10 @@ enum class ErrorCode(
     STUDY_NOT_PUBLIC(400, "공개 스터디가 아닙니다."),
     STUDY_ONLY_MASTER_CAN_INVITE(400, "스터디의 마스터만 초대를 할 수 있습니다."),
     STUDY_ONLY_MASTER_CAN_DELETE(403, "스터디의 마스터만 삭제할 수 있습니다."),
+    STUDY_NOT_MEMBER(400, "스터디에 가입되어 있지 않습니다."),
+    STUDY_ALREADY_MEMBER(400, "이미 스터디에 가입되어 있습니다."),
 
+    STUDY_ONLY_MASTER_CAN_KICK(403, "스터디의 마스터만 추방할 수 있습니다."),
     STUDY_INVITATION_EXPIRED(400, "초대가 만료되었습니다."),
-    INTERNAL_SERVER_ERROR(500, "알수없는 오류가 발생하였습니다.");
+    INTERNAL_SERVER_ERROR(500, "알수없는 오류가 발생하였습니다."),
 }

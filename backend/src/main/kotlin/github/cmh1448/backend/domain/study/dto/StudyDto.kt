@@ -8,7 +8,6 @@ class StudyDto {
     class CreateRequest (
         val name: String,
         val description: String,
-        val masterId: String,
         val type: StudyType
     ) {
         fun toEntity() = Study(
@@ -22,6 +21,10 @@ class StudyDto {
         val name: String?,
         val description: String?,
         val type: StudyType?
+    )
+
+    class KickRequest (
+        val memberEmail: String
     )
 
     class AcceptInvitationRequest (

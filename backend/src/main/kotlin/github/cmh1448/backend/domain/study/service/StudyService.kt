@@ -1,6 +1,7 @@
 package github.cmh1448.backend.domain.study.service
 
 import github.cmh1448.backend.domain.study.dto.StudyDto
+import github.cmh1448.backend.domain.study.entity.Study
 import github.cmh1448.backend.domain.study.entity.enums.StudyType
 import github.cmh1448.backend.domain.study.repository.StudyRepository
 import github.cmh1448.backend.domain.user.model.UserDetails
@@ -19,9 +20,10 @@ class StudyService (
     fun createStudy(request: StudyDto.CreateRequest, user: UserDetails) : StudyDto.Response {
         val toSave = request.toEntity()
 
-        val master = userRepository.findById(user.username)
+        val master = userRepository.findById(user.email)
             .orElseThrow { throw RestException(ErrorCode.USER_NOT_FOUND) }
         toSave.master = master
+        toSave.members.add(master)
 
         return StudyDto.Response(studyRepository.save(toSave))
     }
@@ -36,7 +38,7 @@ class StudyService (
 
 
         request.type?.let {
-            cannotChangeTypeOfPublicStudy(it)
+            cannotChangeTypeOfPublicStudy(study)
             study.type = it
         }
 
@@ -48,15 +50,15 @@ class StudyService (
         val study = studyRepository.findById(id)
             .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
 
-        if (study.master?.email != user.username) {
+        if (study.master?.email != user.email) {
             throw RestException(ErrorCode.STUDY_ONLY_MASTER_CAN_DELETE)
         }
 
         studyRepository.delete(study)
     }
 
-    private fun cannotChangeTypeOfPublicStudy(it: StudyType) {
-        if (it == StudyType.PUBLIC) {
+    private fun cannotChangeTypeOfPublicStudy(it: Study) {
+        if (it.type == StudyType.PUBLIC) {
             throw RestException(ErrorCode.STUDY_TYPE_CHANGE_NOT_ALLOWED)
         }
     }
