@@ -64,4 +64,13 @@ class StudyController(
     ) {
         invitationService.join(studyId, user)
     }
+
+    @PostMapping("/accept-invitation")
+    fun acceptInvitation(
+        request: StudyDto.AcceptInvitationRequest,
+        @AuthenticationPrincipal
+        user: UserDetails
+    ) {
+        invitationService.processInvitation(request.token, user)
+    }
 }

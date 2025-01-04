@@ -24,6 +24,10 @@ class StudyDto {
         val type: StudyType?
     )
 
+    class AcceptInvitationRequest (
+        val token: String
+    )
+
     class InvitationTokenResponse (
         val token: String
     )
