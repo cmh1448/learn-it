@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @ActiveProfiles("local")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
+@DisplayName("스터디 CRUD 테스트")
 class StudyCRUDTest  {
     @Autowired
     private lateinit var userRepository: UserRepository
@@ -46,7 +47,6 @@ class StudyCRUDTest  {
             name = "test study",
             description = "test study description",
             type = StudyType.PRIVATE,
-            masterId = user.email
         )
 
         // when
@@ -67,7 +67,6 @@ class StudyCRUDTest  {
             name = "test study",
             description = "test study description",
             type = StudyType.PRIVATE,
-            masterId = user.email
         )
         val createdStudy = studyService.createStudy(request, UserDetails(user))
 
@@ -94,7 +93,6 @@ class StudyCRUDTest  {
             name = "test study",
             description = "test study description",
             type = StudyType.PUBLIC,
-            masterId = user.email
         )
         val createdStudy = studyService.createStudy(request, UserDetails(user))
 
@@ -119,7 +117,6 @@ class StudyCRUDTest  {
             name = "test study",
             description = "test study description",
             type = StudyType.PRIVATE,
-            masterId = user.email
         )
         val createdStudy = studyService.createStudy(request, UserDetails(user))
 
