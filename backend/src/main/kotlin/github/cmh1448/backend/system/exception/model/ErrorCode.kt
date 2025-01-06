@@ -28,6 +28,7 @@ enum class ErrorCode(
     STUDY_ONLY_MASTER_CAN_DELETE(403, "스터디의 마스터만 삭제할 수 있습니다."),
     STUDY_NOT_MEMBER(400, "스터디에 가입되어 있지 않습니다."),
     STUDY_ALREADY_MEMBER(400, "이미 스터디에 가입되어 있습니다."),
+    STUDY_BANNED_USER(400, "스터디에서 밴 처리된 사용자입니다."),
 
     STUDY_ONLY_MASTER_CAN_KICK(403, "스터디의 마스터만 추방할 수 있습니다."),
     STUDY_INVITATION_EXPIRED(400, "초대가 만료되었습니다."),

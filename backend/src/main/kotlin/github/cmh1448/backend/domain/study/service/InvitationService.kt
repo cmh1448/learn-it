@@ -19,13 +19,22 @@ class InvitationService(
     private val invitationTokenHandler: InvitationTokenHandler,
 ) {
 
-    fun join(studyId: Long, user: UserDetails) {
+    fun joinToPublicStudy(studyId: Long, user: UserDetails) {
         val study = studyRepository.findById(studyId)
             .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
 
         cannotJoinToNonPublicStudy(study)
+        cannotJoinIfBanned(study, user)
 
         study.members.add(user.entity)
+    }
+
+    private fun cannotJoinIfBanned(
+        study: Study,
+        user: UserDetails
+    ) {
+        if (study.bannedUsers.find { it.email == user.email } != null)
+            throw RestException(ErrorCode.STUDY_BANNED_USER)
     }
 
     fun leave(studyId: Long, user: UserDetails) {
@@ -37,6 +46,19 @@ class InvitationService(
         study.members.remove(user.entity)
     }
 
+    fun ban(studyId: Long, request: StudyDto.KickOrBanRequest, user: UserDetails) {
+        val study = studyRepository.findById(studyId)
+            .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
+
+        onlyPublicStudyCanBanUser(study)
+        onlyMasterCanKickOrBanMember(study, user)
+
+        val member = study.members.find { it.email == request.memberEmail }
+            ?: throw RestException(ErrorCode.STUDY_NOT_MEMBER)
+
+        study.members.remove(member)
+    }
+
     private fun onlyMemberCanLeaveStudy(
         study: Study,
         user: UserDetails
@@ -46,19 +68,19 @@ class InvitationService(
             ?: throw RestException(ErrorCode.STUDY_NOT_MEMBER))
     }
 
-    fun kick(studyId: Long, request: StudyDto.KickRequest, user: UserDetails) {
+    fun kick(studyId: Long, request: StudyDto.KickOrBanRequest, user: UserDetails) {
         val study = studyRepository.findById(studyId)
             .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
 
         val member = study.members.find { it.email == request.memberEmail }
             ?: throw RestException(ErrorCode.STUDY_NOT_MEMBER)
 
-        onlyMasterCanKickMember(study, user)
+        onlyMasterCanKickOrBanMember(study, user)
 
         study.members.remove(member)
     }
 
-    private fun onlyMasterCanKickMember(
+    private fun onlyMasterCanKickOrBanMember(
         study: Study,
         user: UserDetails
     ) {
@@ -112,6 +134,11 @@ class InvitationService(
 
 
     private fun cannotJoinToNonPublicStudy(study: Study) {
+        if (study.type == StudyType.PUBLIC)
+            throw RestException(ErrorCode.STUDY_NOT_PUBLIC)
+    }
+
+    private fun onlyPublicStudyCanBanUser(study: Study) {
         if (study.type != StudyType.PUBLIC)
             throw RestException(ErrorCode.STUDY_NOT_PUBLIC)
     }

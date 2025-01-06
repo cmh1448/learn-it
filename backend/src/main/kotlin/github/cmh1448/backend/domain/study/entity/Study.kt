@@ -24,6 +24,14 @@ class Study (
     )
     val members: MutableList<User> = mutableListOf(),
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "STUDY_BANNED_USER",
+        joinColumns = [JoinColumn(name = "study_id")],
+        inverseJoinColumns = [JoinColumn(name = "user_email")]
+    )
+    val bannedUsers: MutableList<User> = mutableListOf(),
+
     @Enumerated(EnumType.STRING)
     var type: StudyType,
 

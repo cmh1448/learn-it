@@ -63,7 +63,7 @@ class StudyInvitationTest {
     @Transactional
     fun joinPublicStudy() {
         //when
-        invitationService.join(study.id!!, UserDetails(user2))
+        invitationService.joinToPublicStudy(study.id!!, UserDetails(user2))
 
         //then
         val updatedStudy = studyRepository.findById(study.id!!).get()

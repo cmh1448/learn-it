@@ -23,7 +23,7 @@ class StudyDto {
         val type: StudyType?
     )
 
-    class KickRequest (
+    class KickOrBanRequest (
         val memberEmail: String
     )
 

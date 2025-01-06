@@ -62,7 +62,19 @@ class StudyController(
         @AuthenticationPrincipal
         user: UserDetails
     ) {
-        invitationService.join(studyId, user)
+        invitationService.joinToPublicStudy(studyId, user)
+    }
+
+    @PostMapping("/{studyId}/ban")
+    fun banMember(
+        @PathVariable
+        studyId: Long,
+        @RequestBody
+        request: StudyDto.KickOrBanRequest,
+        @AuthenticationPrincipal
+        user: UserDetails
+    ) {
+        invitationService.ban(studyId, request, user)
     }
 
     @PostMapping("/accept-invitation")
@@ -89,7 +101,7 @@ class StudyController(
         @PathVariable
         studyId: Long,
         @RequestBody
-        request: StudyDto.KickRequest,
+        request: StudyDto.KickOrBanRequest,
         @AuthenticationPrincipal
         user: UserDetails
     ) {
