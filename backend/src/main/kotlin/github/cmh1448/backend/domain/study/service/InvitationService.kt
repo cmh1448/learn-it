@@ -57,6 +57,7 @@ class InvitationService(
             ?: throw RestException(ErrorCode.STUDY_NOT_MEMBER)
 
         study.members.remove(member)
+        study.bannedUsers.add(member)
     }
 
     private fun onlyMemberCanLeaveStudy(
@@ -132,9 +133,8 @@ class InvitationService(
             throw RestException(ErrorCode.STUDY_ONLY_MASTER_CAN_INVITE)
     }
 
-
     private fun cannotJoinToNonPublicStudy(study: Study) {
-        if (study.type == StudyType.PUBLIC)
+        if (study.type != StudyType.PUBLIC)
             throw RestException(ErrorCode.STUDY_NOT_PUBLIC)
     }
 
