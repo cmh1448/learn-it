@@ -1,5 +1,6 @@
 package github.cmh1448.backend.domain.study
 
+import github.cmh1448.backend.domain.study.dto.StudyDto
 import github.cmh1448.backend.domain.study.entity.Study
 import github.cmh1448.backend.domain.study.entity.enums.StudyType
 import github.cmh1448.backend.domain.study.repository.StudyRepository
@@ -45,7 +46,7 @@ class StudyInvitationTest {
         username = "tester2",
         password = "password"
     )
-    private val study: Study = Study(
+    private var study: Study = Study(
         name = "test study",
         description = "test study description",
         type = StudyType.PUBLIC,
@@ -55,7 +56,7 @@ class StudyInvitationTest {
     @BeforeAll
     fun setUp() {
         userRepository.saveAllAndFlush(listOf(user, user2))
-        studyRepository.saveAndFlush(study)
+        study = studyRepository.saveAndFlush(study)
     }
 
     @Test
@@ -102,7 +103,23 @@ class StudyInvitationTest {
         }
 
         //then
-        Assertions.assertThat(exception).isInstanceOf(RestException::class.java)
         Assertions.assertThat(exception.errorCode).isEqualTo(ErrorCode.STUDY_INVITATION_EXPIRED)
+    }
+
+    @Test
+    @DisplayName("밴 처리된 사용자 가입 시도시 예외 발생")
+    @Transactional
+    fun joinBannedUser() {
+        //given
+        invitationService.joinToPublicStudy(study.id!!, UserDetails(user2))
+        invitationService.ban(study.id!!, StudyDto.KickOrBanRequest(user2.email), UserDetails(user))
+
+        //when
+        val exception = Assertions.catchThrowableOfType(RestException::class.java) {
+            invitationService.joinToPublicStudy(study.id!!, UserDetails(user2))
+        }
+
+        //then
+        Assertions.assertThat(exception.errorCode).isEqualTo(ErrorCode.STUDY_BANNED_USER)
     }
 }
