@@ -28,7 +28,7 @@ class InvitationToken (
 @Component
 @EnableConfigurationProperties(InvitationProperties::class)
 class InvitationTokenHandler(
-    private final val invitationProperties: InvitationProperties
+    invitationProperties: InvitationProperties
 ) {
     private final val secretKey: Key = invitationProperties.secret?.let {
         Keys.hmacShaKeyFor(it.toByteArray())
