@@ -7,10 +7,12 @@ import jakarta.persistence.*
 class Note (
     @Id @GeneratedValue
     val id: Long,
+
     @ManyToOne(fetch = FetchType.LAZY)
     var subject: Subject,
+
     var title: String,
+
     @Lob
     var content: String,
-) {
-}
+)

@@ -5,6 +5,7 @@ import github.cmh1448.backend.domain.study.entity.Study
 import github.cmh1448.backend.domain.study.entity.enums.StudyType
 import github.cmh1448.backend.domain.study.repository.StudyRepository
 import github.cmh1448.backend.domain.study.service.InvitationService
+import github.cmh1448.backend.domain.study.service.MemberService
 import github.cmh1448.backend.domain.user.entity.User
 import github.cmh1448.backend.domain.user.model.UserDetails
 import github.cmh1448.backend.domain.user.repository.UserRepository
@@ -26,6 +27,9 @@ import java.time.LocalDate
 @ActiveProfiles("local")
 @DisplayName("스터디 초대 / 멤버 관리 테스트")
 class StudyInvitationTest {
+
+    @Autowired
+    private lateinit var memberService: MemberService
 
     @Autowired
     private lateinit var invitationService: InvitationService
@@ -68,7 +72,7 @@ class StudyInvitationTest {
 
         //then
         val updatedStudy = studyRepository.findById(study.id!!).get()
-        Assertions.assertThat(updatedStudy.members).contains(user2)
+        Assertions.assertThat(updatedStudy.members.filter { it.user.email == user2.email }).isNotEmpty
     }
 
     @Test
@@ -84,7 +88,7 @@ class StudyInvitationTest {
         //then
         val updatedStudy = studyRepository.findById(study.id!!).get()
 
-        Assertions.assertThat(updatedStudy.members).contains(user2)
+        Assertions.assertThat(updatedStudy.members.filter { it.user.email == user2.email }).isNotEmpty
     }
 
     @Test
@@ -112,7 +116,7 @@ class StudyInvitationTest {
     fun joinBannedUser() {
         //given
         invitationService.joinToPublicStudy(study.id!!, UserDetails(user2))
-        invitationService.ban(study.id!!, StudyDto.KickOrBanRequest(user2.email), UserDetails(user))
+        memberService.ban(study.id!!, StudyDto.KickOrBanRequest(user2.email), UserDetails(user))
 
         //when
         val exception = Assertions.catchThrowableOfType(RestException::class.java) {

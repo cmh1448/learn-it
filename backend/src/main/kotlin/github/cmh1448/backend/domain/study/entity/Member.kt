@@ -1,20 +1,16 @@
 package github.cmh1448.backend.domain.study.entity
 
+import github.cmh1448.backend.domain.user.entity.User
 import jakarta.persistence.*
 
 @Entity
-class Subject (
+class Member (
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    var study: Study,
+    val study: Study,
 
-    var name: String,
-
-    var description: String,
-
-    @Column(name = "order_num")
-    @OrderBy
-    var order: Int
+    @ManyToOne(fetch = FetchType.LAZY)
+    val user: User,
 )

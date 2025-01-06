@@ -1,22 +1,27 @@
 package github.cmh1448.backend.domain.study.service
 
 import github.cmh1448.backend.domain.study.dto.StudyDto
+import github.cmh1448.backend.domain.study.entity.Member
 import github.cmh1448.backend.domain.study.entity.Study
 import github.cmh1448.backend.domain.study.entity.enums.StudyType
 import github.cmh1448.backend.domain.study.provider.InvitationToken
 import github.cmh1448.backend.domain.study.provider.InvitationTokenHandler
+import github.cmh1448.backend.domain.study.repository.MemberQueryRepository
 import github.cmh1448.backend.domain.study.repository.StudyRepository
 import github.cmh1448.backend.domain.user.model.UserDetails
 import github.cmh1448.backend.system.exception.model.ErrorCode
 import github.cmh1448.backend.system.exception.model.RestException
 import io.jsonwebtoken.ExpiredJwtException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
+@Transactional
 class InvitationService(
-    val studyRepository: StudyRepository,
+    private val studyRepository: StudyRepository,
     private val invitationTokenHandler: InvitationTokenHandler,
+    private val memberQueryRepository: MemberQueryRepository,
 ) {
 
     fun joinToPublicStudy(studyId: Long, user: UserDetails) {
@@ -26,7 +31,12 @@ class InvitationService(
         cannotJoinToNonPublicStudy(study)
         cannotJoinIfBanned(study, user)
 
-        study.members.add(user.entity)
+        study.members.add(
+            Member(
+                study = study,
+                user = user.entity
+            )
+        )
     }
 
     private fun cannotJoinIfBanned(
@@ -35,58 +45,6 @@ class InvitationService(
     ) {
         if (study.bannedUsers.find { it.email == user.email } != null)
             throw RestException(ErrorCode.STUDY_BANNED_USER)
-    }
-
-    fun leave(studyId: Long, user: UserDetails) {
-        val study = studyRepository.findById(studyId)
-            .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
-
-        onlyMemberCanLeaveStudy(study, user)
-
-        study.members.remove(user.entity)
-    }
-
-    fun ban(studyId: Long, request: StudyDto.KickOrBanRequest, user: UserDetails) {
-        val study = studyRepository.findById(studyId)
-            .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
-
-        onlyPublicStudyCanBanUser(study)
-        onlyMasterCanKickOrBanMember(study, user)
-
-        val member = study.members.find { it.email == request.memberEmail }
-            ?: throw RestException(ErrorCode.STUDY_NOT_MEMBER)
-
-        study.members.remove(member)
-        study.bannedUsers.add(member)
-    }
-
-    private fun onlyMemberCanLeaveStudy(
-        study: Study,
-        user: UserDetails
-    ) {
-        (study.members.indexOf(user.entity)
-            .takeIf { it != -1 }
-            ?: throw RestException(ErrorCode.STUDY_NOT_MEMBER))
-    }
-
-    fun kick(studyId: Long, request: StudyDto.KickOrBanRequest, user: UserDetails) {
-        val study = studyRepository.findById(studyId)
-            .orElseThrow { throw RestException(ErrorCode.GLOBAL_NOT_FOUND) }
-
-        val member = study.members.find { it.email == request.memberEmail }
-            ?: throw RestException(ErrorCode.STUDY_NOT_MEMBER)
-
-        onlyMasterCanKickOrBanMember(study, user)
-
-        study.members.remove(member)
-    }
-
-    private fun onlyMasterCanKickOrBanMember(
-        study: Study,
-        user: UserDetails
-    ) {
-        if (study.master?.email != user.email)
-            throw RestException(ErrorCode.STUDY_ONLY_MASTER_CAN_KICK)
     }
 
     fun createInvitationToken(studyId: Long, expireDate: LocalDate, user: UserDetails) : StudyDto.InvitationTokenResponse {
@@ -114,14 +72,19 @@ class InvitationService(
 
         cannotJoinTwice(study, user)
 
-        study.members.add(user.entity)
+        study.members.add(
+            Member(
+                study = study,
+                user = user.entity
+            )
+        )
     }
 
     private fun cannotJoinTwice(
         study: Study,
         user: UserDetails
     ) {
-        if (study.members.find { it.email == user.email } != null)
+        if (memberQueryRepository.existsByStudyIdAndUserId(study.id!!, user.email))
             throw RestException(ErrorCode.STUDY_ALREADY_MEMBER)
     }
 
@@ -134,11 +97,6 @@ class InvitationService(
     }
 
     private fun cannotJoinToNonPublicStudy(study: Study) {
-        if (study.type != StudyType.PUBLIC)
-            throw RestException(ErrorCode.STUDY_NOT_PUBLIC)
-    }
-
-    private fun onlyPublicStudyCanBanUser(study: Study) {
         if (study.type != StudyType.PUBLIC)
             throw RestException(ErrorCode.STUDY_NOT_PUBLIC)
     }

@@ -2,8 +2,13 @@ package github.cmh1448.backend.domain.study.controller
 
 import github.cmh1448.backend.domain.study.dto.StudyDto
 import github.cmh1448.backend.domain.study.service.InvitationService
+import github.cmh1448.backend.domain.study.service.MemberService
 import github.cmh1448.backend.domain.study.service.StudyService
+import github.cmh1448.backend.domain.user.dto.UserDto
 import github.cmh1448.backend.domain.user.model.UserDetails
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
+import org.springframework.data.web.PagedModel
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
@@ -12,7 +17,8 @@ import java.time.LocalDate
 @RequestMapping("/api/study")
 class StudyController(
     private val studyService: StudyService,
-    private val invitationService: InvitationService
+    private val invitationService: InvitationService,
+    private val memberService: MemberService
 ) {
     @PostMapping
     fun createStudy(request: StudyDto.CreateRequest,
@@ -42,6 +48,17 @@ class StudyController(
     ) {
         studyService.deleteStudy(id, user)
     }
+
+    @GetMapping
+    fun paginateStudy(
+        @PageableDefault
+        page: Pageable,
+        @AuthenticationPrincipal
+        user: UserDetails
+    ) : PagedModel<StudyDto.Response> {
+        return studyService.paginateStudies(page, user)
+    }
+
 
     @GetMapping("/{studyId}/invite-token")
     fun getInvitationToken(
@@ -74,7 +91,7 @@ class StudyController(
         @AuthenticationPrincipal
         user: UserDetails
     ) {
-        invitationService.ban(studyId, request, user)
+        memberService.ban(studyId, request, user)
     }
 
     @PostMapping("/accept-invitation")
@@ -93,7 +110,7 @@ class StudyController(
         @AuthenticationPrincipal
         user: UserDetails
     ) {
-        invitationService.leave(studyId, user)
+        memberService.leave(studyId, user)
     }
 
     @PostMapping("/{studyId}/kick")
@@ -105,6 +122,16 @@ class StudyController(
         @AuthenticationPrincipal
         user: UserDetails
     ) {
-        invitationService.kick(studyId, request, user)
+        memberService.kick(studyId, request, user)
+    }
+
+    @GetMapping("/{studyId}/members")
+    fun paginateMembers(
+        @PathVariable
+        studyId: Long,
+        @PageableDefault
+        page: Pageable,
+    ) : PagedModel<UserDto.Response> {
+        return memberService.paginateMembersByStudyId(studyId, page)
     }
 }

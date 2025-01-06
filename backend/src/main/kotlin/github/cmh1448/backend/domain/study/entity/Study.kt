@@ -16,13 +16,8 @@ class Study (
     @ManyToOne(fetch = FetchType.LAZY)
     var master: User? = null,
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "STUDY_USER",
-        joinColumns = [JoinColumn(name = "study_id")],
-        inverseJoinColumns = [JoinColumn(name = "user_email")]
-    )
-    val members: MutableList<User> = mutableListOf(),
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "study", cascade = [CascadeType.ALL])
+    val members: MutableList<Member> = mutableListOf(),
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
