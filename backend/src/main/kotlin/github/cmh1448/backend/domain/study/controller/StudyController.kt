@@ -53,10 +53,12 @@ class StudyController(
     fun paginateStudy(
         @PageableDefault
         page: Pageable,
+        @RequestBody(required = false)
+        searchParams: StudyDto.SearchParams?,
         @AuthenticationPrincipal
         user: UserDetails
     ) : PagedModel<StudyDto.Response> {
-        return studyService.paginateStudies(page, user)
+        return studyService.paginateStudies(page, searchParams, user)
     }
 
 

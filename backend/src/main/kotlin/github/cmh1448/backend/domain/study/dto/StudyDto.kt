@@ -23,6 +23,11 @@ class StudyDto {
         val type: StudyType?
     )
 
+    class SearchParams (
+        val name: String? = null,
+        val type: StudyType? = null,
+    )
+
     class KickOrBanRequest (
         val memberEmail: String
     )

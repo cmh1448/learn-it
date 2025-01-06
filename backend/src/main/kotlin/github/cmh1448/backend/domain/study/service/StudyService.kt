@@ -81,7 +81,7 @@ class StudyService(
     }
 
     @Transactional(readOnly = true)
-    fun paginateStudies(pageable: Pageable, user: UserDetails) : PagedModel<StudyDto.Response> {
-        return studyQueryRepository.paginateStudy(pageable, user)
+    fun paginateStudies(pageable: Pageable, searchParams: StudyDto.SearchParams?, user: UserDetails) : PagedModel<StudyDto.Response> {
+        return studyQueryRepository.paginateStudy(pageable, searchParams, user)
     }
 }

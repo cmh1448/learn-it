@@ -1,5 +1,6 @@
 package github.cmh1448.backend.domain.study.repository
 
+import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 import github.cmh1448.backend.domain.study.dto.StudyDto
@@ -16,10 +17,11 @@ class StudyQueryRepository(
     val queryFactory: JPAQueryFactory,
 ){
 
-    fun paginateStudy(pageable: Pageable, user: UserDetails): PagedModel<StudyDto.Response> {
+    fun paginateStudy(pageable: Pageable, searchParams: StudyDto.SearchParams?, user: UserDetails): PagedModel<StudyDto.Response> {
         val content = queryFactory.selectFrom(study)
             .where(
-                pagingConditionByUser(user)
+                pagingConditionByUser(user),
+                pagingConditionBySearchParams(searchParams)
             )
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
@@ -35,4 +37,15 @@ class StudyQueryRepository(
     private fun pagingConditionByUser(user: UserDetails): BooleanExpression =
         // 공개 스터디이거나 사용자가 멤버인 스터디만 조회
         study.type.eq(StudyType.PUBLIC).or(study.members.any().user.email.eq(user.email))
+
+    private fun pagingConditionBySearchParams(searchParams: StudyDto.SearchParams?): BooleanBuilder {
+        val builder = BooleanBuilder()
+
+        searchParams?.let {
+            it.name?.let { builder.and(study.name.contains(it)) }
+            it.type?.let { builder.and(study.type.eq(it)) }
+        }
+
+        return builder
+    }
 }
