@@ -1,6 +1,8 @@
-import { defineConfig } from 'vite'
-import solid from 'vite-plugin-solid'
+import react from "@vitejs/plugin-react-swc";
+import { defineConfig } from "vite";
+import paths from "vite-tsconfig-paths";
 
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [solid()],
-})
+  plugins: [react(), paths()],
+});

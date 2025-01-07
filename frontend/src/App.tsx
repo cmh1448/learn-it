@@ -1,9 +1,14 @@
-import { createSignal } from "solid-js";
+import { useMemo } from "react";
+import { useRoutes } from "react-router-dom";
+import { routes } from "./routes/routes";
 
 function App() {
-  const [count, setCount] = createSignal(0);
+  const currentRoute = useMemo(() => {
+    return routes["logined"];
+  }, []);
+  const renderedRoute = useRoutes(currentRoute);
 
-  return <div></div>;
+  return <>{renderedRoute}</>;
 }
 
 export default App;
